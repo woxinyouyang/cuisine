@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#3C2415">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>中华古典菜肴百科</title>
+
+  <!-- Google Fonts: Ma Shan Zheng (headings), Noto Serif SC (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       1. CSS Reset & Base
+       ============================================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Serif SC', 'SimSun', 'STSong', serif;
+      background-color: #F5F0E8;
+      color: #3C2415;
+      line-height: 1.8;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Paper texture background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 90, 43, 0.02) 2px, rgba(139, 90, 43, 0.02) 4px),
+        radial-gradient(ellipse at 30% 30%, rgba(139, 26, 26, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(47, 79, 47, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* All content sits above the background layer */
+    .header,
+    .meander-divider,
+    .search-section,
+    .cuisine-bar,
+    .dish-grid,
+    .pagination,
+    .modal-overlay,
+    .footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================================
+       2. Typography
+       ============================================================ */
+    h1, h2, h3, h4 {
+      font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* ============================================================
+       3. Header (匾额)
+       ============================================================ */
+    .header {
+      background: linear-gradient(135deg, #3C2415 0%, #5C3A28 50%, #2F4F2F 100%);
+      text-align: center;
+      padding: 2.5rem 1.5rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top decorative repeating border (gold dash pattern) */
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: repeating-linear-gradient(
+        90deg,
+        #D4A574 0px,
+        #D4A574 8px,
+        transparent 8px,
+        transparent 16px
+      );
+    }
+
+    .header-title {
+      font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', cursive;
+      font-size: 3.2rem;
+      color: #D4A574;
+      text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(212, 165, 116, 0.3);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.6rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header-subtitle {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.95rem;
+      color: #C4A882;
+      letter-spacing: 0.6em;
+      font-weight: 400;
+      opacity: 0.85;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Seal (印章) */
+    .seal {
+      position: absolute;
+      top: 1.2rem;
+      right: 2rem;
+      width: 60px;
+      height: 60px;
+      border: 3px solid #8B1A1A;
+      color: #8B1A1A;
+      font-family: 'Ma Shan Zheng', 'KaiTi', cursive;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(5deg);
+      opacity: 0.8;
+      z-index: 2;
+      background: rgba(139, 26, 26, 0.06);
+      border-radius: 2px;
+      user-select: none;
+    }
+
+    /* ============================================================
+       4. Meander Divider (回形纹)
+       ============================================================ */
+    .meander-divider {
+      height: 12px;
+      background: repeating-linear-gradient(
+        90deg,
+        #8B1A1A 0px,
+        #8B1A1A 4px,
+        transparent 4px,
+        transparent 6px,
+        #8B1A1A 6px,
+        #8B1A1A 10px,
+        transparent 10px,
+        transparent 16px,
+        #8B1A1A 16px,
+        #8B1A1A 20px,
+        transparent 20px,
+        transparent 22px,
+        #8B1A1A 22px,
+        #8B1A1A 26px,
+        transparent 26px,
+        transparent 32px
+      );
+      opacity: 0.6;
+    }
+
+    /* ============================================================
+       5. Search Section
+       ============================================================ */
+    .search-section {
+      max-width: 700px;
+      margin: -2rem auto 0;
+      padding: 0 1rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .search-box {
+      background: #FFF8F0;
+      border: 2px solid #C4A882;
+      border-radius: 4px;
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      position: relative;
+      box-shadow:
+        0 4px 16px rgba(60, 36, 21, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Decorative "brush stroke" border effect */
+    .search-box::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border: 1px solid rgba(196, 168, 130, 0.3);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .search-box:focus-within {
+      box-shadow:
+        0 6px 24px rgba(60, 36, 21, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      border-color: #D4A574;
+    }
+
+    .search-icon {
+      font-size: 1.2rem;
+      color: #C4A882;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1rem;
+      color: #3C2415;
+      outline: none;
+      letter-spacing: 0.1em;
+    }
+
+    .search-input::placeholder {
+      color: #C4A882;
+      opacity: 0.7;
+      letter-spacing: 0.3em;
+    }
+
+    /* ============================================================
+       6. Cuisine Bar (菜系标签栏)
+       ============================================================ */
+    .cuisine-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 1.8rem 1rem 0.8rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .cuisine-tag {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.85rem;
+      padding: 0.4rem 1.2rem;
+      border: 1.5px solid #C4A882;
+      border-radius: 100px;
+      background: transparent;
+      color: #5C3A28;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .cuisine-tag:hover {
+      background: rgba(139, 26, 26, 0.08);
+      border-color: #8B1A1A;
+      color: #8B1A1A;
+    }
+
+    .cuisine-tag.active {
+      background: #8B1A1A;
+      border-color: #8B1A1A;
+      color: #FFF8F0;
+    }
+
+    /* ============================================================
+       7. Dish Grid (菜品网格)
+       ============================================================ */
+    .dish-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    /* ============================================================
+       8. Dish Card (古籍书卷风格)
+       ============================================================ */
+    .dish-card {
+      background: #FFF8F0;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      box-shadow:
+        0 2px 8px rgba(60, 36, 21, 0.08),
+        0 1px 3px rgba(60, 36, 21, 0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      /* Left edge: 4px red gradient border (book spine) */
+      border-left: 4px solid transparent;
+      border-image: linear-gradient(180deg, #8B1A1A, #C41E3A, #8B1A1A) 1;
+    }
+
+    .dish-card:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 8px 24px rgba(60, 36, 21, 0.14),
+        0 2px 8px rgba(60, 36, 21, 0.08);
+    }
+
+    /* Ink wash effect (水墨) */
+    .dish-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(0, 0, 0, 0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .dish-card:hover::after {
+      opacity: 1;
+    }
+
+    .dish-card-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background: #E8E0D0;
+      position: relative;
+      z-index: 0;
+    }
+
+    .dish-card-image-placeholder {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #E8E0D0, #F0E8D8);
+      color: #C4A882;
+      font-family: 'Ma Shan Zheng', cursive;
+      font-size: 2rem;
+      position: relative;
+      z-index: 0;
+    }
+
+    .dish-card-body {
+      padding: 0.8rem 1rem 1rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .dish-card-name {
+      font-family: 'Ma Shan Zheng', cursive;
+      font-size: 1.4rem;
+      color: #3C2415;
+      margin-bottom: 0.15rem;
+      letter-spacing: 0.05em;
+    }
+
+    .dish-card-pinyin {
+      font-size: 0.8rem;
+      color: #A08060;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .dish-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .dish-card-tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 2px;
+      background: #F5F0E8;
+      color: #5C3A28;
+      border: 1px solid #D4C4A8;
+      letter-spacing: 0.05em;
+    }
+
+    .dish-card-tag.dynasty {
+      background: rgba(47, 79, 47, 0.08);
+      border-color: #2F4F2F;
+      color: #2F4F2F;
+    }
+
+    .dish-card-tag.cuisine {
+      background: rgba(139, 26, 26, 0.06);
+      border-color: #C4A882;
+      color: #8B1A1A;
+    }
+
+    /* ============================================================
+       9. Pagination
+       ============================================================ */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1.5rem 1rem 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.9rem;
+      border: 1.5px solid #C4A882;
+      border-radius: 4px;
+      background: transparent;
+      color: #5C3A28;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .page-btn:hover {
+      background: rgba(139, 26, 26, 0.08);
+      border-color: #8B1A1A;
+      color: #8B1A1A;
+    }
+
+    .page-btn.active {
+      background: #8B1A1A;
+      border-color: #8B1A1A;
+      color: #FFF8F0;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .page-info {
+      font-size: 0.8rem;
+      color: #A08060;
+      margin-left: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ============================================================
+       10. Modal Overlay (卷轴详情弹窗)
+       ============================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(30, 18, 10, 0.65);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-scroll {
+      background: #FFF8F0;
+      border-radius: 4px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.15);
+      animation: scrollUnfold 0.5s ease-out forwards;
+    }
+
+    /* Scroll rod decoration (卷轴杆): top bar */
+    .modal-scroll::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(
+        90deg,
+        #8B1A1A 0%,
+        #C41E3A 15%,
+        #D4A574 30%,
+        #C41E3A 50%,
+        #8B1A1A 70%,
+        #C41E3A 85%,
+        #8B1A1A 100%
+      );
+      border-radius: 4px 4px 0 0;
+      z-index: 5;
+    }
+
+    /* Scroll rod decoration (卷轴杆): bottom bar */
+    .modal-scroll::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(
+        90deg,
+        #8B1A1A 0%,
+        #C41E3A 15%,
+        #D4A574 30%,
+        #C41E3A 50%,
+        #8B1A1A 70%,
+        #C41E3A 85%,
+        #8B1A1A 100%
+      );
+      border-radius: 0 0 4px 4px;
+      z-index: 5;
+    }
+
+    /* ScrollUnfold animation */
+    @keyframes scrollUnfold {
+      from {
+        opacity: 0;
+        transform: scaleY(0.95) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid #C4A882;
+      background: #FFF8F0;
+      color: #5C3A28;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .modal-close:hover {
+      background: #8B1A1A;
+      border-color: #8B1A1A;
+      color: #FFF8F0;
+    }
+
+    .modal-content {
+      padding: 2rem 1.8rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .modal-image {
+      width: 100%;
+      border-radius: 2px;
+      display: block;
+      background: #E8E0D0;
+    }
+
+    .modal-image-placeholder {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #E8E0D0, #F0E8D8);
+      color: #C4A882;
+      font-family: 'Ma Shan Zheng', cursive;
+      font-size: 3rem;
+      border-radius: 2px;
+    }
+
+    .modal-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .modal-name {
+      font-family: 'Ma Shan Zheng', cursive;
+      font-size: 2rem;
+      color: #3C2415;
+      letter-spacing: 0.08em;
+    }
+
+    .modal-pinyin {
+      font-size: 0.9rem;
+      color: #A08060;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .modal-tag {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: 2px;
+      border: 1px solid #D4C4A8;
+      color: #5C3A28;
+      background: #F5F0E8;
+    }
+
+    .modal-tag.dynasty {
+      background: rgba(47, 79, 47, 0.1);
+      border-color: #2F4F2F;
+      color: #2F4F2F;
+    }
+
+    .modal-tag.cuisine {
+      background: rgba(139, 26, 26, 0.08);
+      border-color: #C4A882;
+      color: #8B1A1A;
+    }
+
+    .modal-description {
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: #3C2415;
+      text-indent: 2em;
+    }
+
+    .modal-detail-row {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #5C3A28;
+    }
+
+    .modal-detail-label {
+      font-weight: 600;
+      color: #8B1A1A;
+      white-space: nowrap;
+    }
+
+    /* ============================================================
+       11. Footer
+       ============================================================ */
+    .footer {
+      text-align: center;
+      padding: 1.8rem 1rem;
+      color: #A08060;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      border-top: 1px solid #D4C4A8;
+      background: rgba(245, 240, 232, 0.8);
+    }
+
+    /* ============================================================
+       12. Responsive Design
+       ============================================================ */
+
+    /* Tablet: 768px and below */
+    @media (max-width: 768px) {
+      .header {
+        padding: 2rem 1rem 3rem;
+      }
+
+      .header-title {
+        font-size: 2.4rem;
+        letter-spacing: 0.1em;
+      }
+
+      .header-subtitle {
+        font-size: 0.8rem;
+        letter-spacing: 0.4em;
+      }
+
+      .seal {
+        width: 46px;
+        height: 46px;
+        font-size: 1.5rem;
+        top: 0.8rem;
+        right: 1rem;
+      }
+
+      .dish-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 18px;
+        padding: 1.2rem 0.8rem 1.5rem;
+      }
+
+      .modal-content {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1.2rem;
+      }
+
+      .modal-image {
+        max-height: 280px;
+        object-fit: cover;
+      }
+
+      .modal-scroll {
+        max-height: 90vh;
+      }
+
+      .search-section {
+        margin: -1.5rem auto 0;
+        padding: 0 0.8rem;
+      }
+
+      .search-box {
+        padding: 0.6rem 1rem;
+      }
+    }
+
+    /* Mobile: 480px and below */
+    @media (max-width: 480px) {
+      .header {
+        padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 0.8rem 2.5rem;
+      }
+
+      .header-title {
+        font-size: 1.8rem;
+        letter-spacing: 0.05em;
+      }
+
+      .header-subtitle {
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+      }
+
+      .seal {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+        top: calc(0.6rem + env(safe-area-inset-top, 0px));
+        right: 0.6rem;
+        border-width: 2px;
+      }
+
+      .dish-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 1rem 0.6rem 1.2rem;
+      }
+
+      .dish-card-image {
+        height: 160px;
+      }
+
+      .dish-card-body {
+        padding: 0.6rem 0.8rem 0.8rem;
+      }
+
+      .dish-card-name { font-size: 1.2rem; }
+      .dish-card-pinyin { font-size: 0.7rem; }
+
+      /* Cuisine bar: horizontal scroll */
+      .cuisine-bar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.4rem;
+        padding: 1.2rem 0.6rem 0.6rem;
+        justify-content: flex-start;
+      }
+      .cuisine-bar::-webkit-scrollbar { display: none; }
+
+      .cuisine-tag {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+        flex-shrink: 0;
+      }
+
+      .search-section {
+        margin: -1.2rem auto 0;
+        padding: 0 0.6rem;
+      }
+
+      .search-box {
+        padding: 0.5rem 0.8rem;
+        gap: 0.5rem;
+      }
+
+      .search-input { font-size: 0.9rem; }
+      .search-icon { font-size: 1rem; }
+
+      /* Modal → bottom sheet */
+      .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+      }
+
+      .modal-scroll {
+        max-width: 100%;
+        max-height: 92vh;
+        border-radius: 12px 12px 0 0;
+        animation: modalSlideUp 0.35s ease-out;
+      }
+
+      @keyframes modalSlideUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      .modal-scroll::before,
+      .modal-scroll::after { border-radius: 0; }
+
+      /* Drag handle replaces top rod */
+      .modal-scroll::before {
+        content: '';
+        position: absolute;
+        top: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 36px;
+        height: 4px;
+        border-radius: 2px;
+        background: #D4C4A8;
+        z-index: 10;
+      }
+
+      .modal-content {
+        grid-template-columns: 1fr;
+        padding: 1.2rem 0.8rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+        gap: 1rem;
+      }
+
+      .modal-image {
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .modal-scroll { max-height: 90vh; }
+
+      .modal-name { font-size: 1.5rem; }
+      .modal-description { font-size: 0.85rem; }
+      .modal-detail-row { font-size: 0.8rem; }
+
+      .modal-close {
+        top: 0.6rem;
+        right: 0.6rem;
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+      }
+
+      .pagination {
+        gap: 0.3rem;
+        padding: 1rem 0.6rem 1.5rem;
+      }
+
+      .page-btn {
+        font-size: 0.78rem;
+        padding: 0.3rem 0.7rem;
+        min-width: 30px;
+      }
+
+      .page-info { font-size: 0.7rem; }
+
+      .footer {
+        padding: 1.2rem 0.8rem calc(1rem + env(safe-area-inset-bottom, 0px));
+        font-size: 0.75rem;
+      }
+
+      #backToTop {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        width: 40px !important;
+        height: 40px !important;
+      }
+    }
+
+    /* Touch device optimization */
+    @media (hover: none) and (pointer: coarse) {
+      .dish-card:hover {
+        transform: none;
+        box-shadow: 0 2px 8px rgba(60, 36, 21, 0.08);
+      }
+      .dish-card:active { transform: scale(0.98); }
+      .dish-card::after { display: none; }
+      .cuisine-tag:hover {
+        background: transparent;
+        border-color: #C4A882;
+        color: #5C3A28;
+      }
+      .cuisine-tag:active { opacity: 0.7; }
+    }
+
+    /* ============================================================
+       13. Utility & Scrollbar Styling
+       ============================================================ */
+    .modal-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-scroll::-webkit-scrollbar-track {
+      background: #F5F0E8;
+    }
+
+    .modal-scroll::-webkit-scrollbar-thumb {
+      background: #C4A882;
+      border-radius: 3px;
+    }
+
+    .modal-scroll::-webkit-scrollbar-thumb:hover {
+      background: #A08060;
+    }
+
+    /* Loading state */
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      color: #A08060;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+    }
+
+    .loading-spinner::before {
+      content: '';
+      width: 32px;
+      height: 32px;
+      border: 2px solid #D4C4A8;
+      border-top-color: #8B1A1A;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 0.8rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #A08060;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+    }
+
+    .empty-state::before {
+      content: '🍶';
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER (匾额)
+       ============================================================ -->
+  <header class="header">
+    <div class="seal">食</div>
+    <h1 class="header-title">中华古典菜肴百科</h1>
+    <p class="header-subtitle">—— 探 寻 千 年 饮 食 文 化 ——</p>
+  </header>
+
+  <!-- ============================================================
+       MEANDER DIVIDER (回形纹)
+       ============================================================ -->
+  <div class="meander-divider"></div>
+
+  <!-- ============================================================
+       SEARCH SECTION
+       ============================================================ -->
+  <section class="search-section">
+    <div class="search-box">
+      <span class="search-icon">&#x1F50D;</span>
+      <input class="search-input" type="text" id="searchInput" placeholder="搜 寻 菜 肴 名 称…">
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CUISINE BAR (菜系标签栏)
+       ============================================================ -->
+  <nav class="cuisine-bar" id="cuisineBar"></nav>
+
+  <!-- ============================================================
+       LOADING INDICATOR
+       ============================================================ -->
+  <div id="loading" style="text-align:center;padding:4rem;color:#8B5A2B;">
+    <div style="font-size:2.5rem;margin-bottom:1rem;">📜</div>
+    正在展开卷轴，请稍候…
+  </div>
+
+  <!-- ============================================================
+       DISH GRID (菜品网格)
+       ============================================================ -->
+  <div class="dish-grid" id="dishGrid">
+    <div class="loading-spinner">加载中…</div>
+  </div>
+
+  <!-- ============================================================
+       PAGINATION
+       ============================================================ -->
+  <div class="pagination" id="pagination"></div>
+
+  <!-- ============================================================
+       MODAL OVERLAY (卷轴详情弹窗)
+       ============================================================ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-scroll" id="modalScroll">
+      <button class="modal-close" id="modalClose">&#x2715;</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       BACK TO TOP
+       ============================================================ -->
+  <button id="backToTop" style="display:none;position:fixed;bottom:2rem;right:2rem;z-index:100;width:48px;height:48px;background:#8B1A1A;color:#F5F0E8;border:none;border-radius:50%;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 15px rgba(139,26,26,0.3);transition:opacity 0.3s;">↑</button>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    中华古典菜肴百科 &middot; 收录历代名馔 &middot; 传承千年饮食文化
+  </footer>
+
+  <!-- ============================================================
+       SCRIPT (placeholder for Task 6)
+       ============================================================ -->
+  <script>
+    // ================================================================
+    //  State
+    // ================================================================
+    let allDishes = [];
+    let currentCuisine = '全部';
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+    const CN_NUM = ['零','一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','二十一','二十二','二十三','二十四','二十五'];
+
+    // ================================================================
+    //  DOM refs
+    // ================================================================
+    const searchInput = document.getElementById('searchInput');
+    const cuisineBar = document.getElementById('cuisineBar');
+    const dishGrid = document.getElementById('dishGrid');
+    const pagination = document.getElementById('pagination');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+    const modalContent = document.getElementById('modalContent');
+
+    // ================================================================
+    //  Data Loading
+    // ================================================================
+    async function loadData() {
+      try {
+        const resp = await fetch('dishes.json');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        allDishes = data.dishes;
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) loadingEl.style.display = 'none';
+        renderCuisineBar();
+        render();
+      } catch (err) {
+        dishGrid.innerHTML = '<div class="loading-spinner" style="color:#8B1A1A;">数据加载失败，请刷新页面重试。</div>';
+        console.error('加载菜肴数据失败:', err);
+      }
+    }
+
+    // ================================================================
+    //  Cuisine Filter Bar
+    // ================================================================
+    function renderCuisineBar() {
+      const cuisines = ['全部', ...new Set(allDishes.map(d => d.cuisine))];
+      cuisineBar.innerHTML = cuisines.map(c =>
+        `<button class="cuisine-tag${c === currentCuisine ? ' active' : ''}">${c}</button>`
+      ).join('');
+
+      cuisineBar.querySelectorAll('.cuisine-tag').forEach(btn => {
+        btn.addEventListener('click', () => {
+          cuisineBar.querySelector('.cuisine-tag.active')?.classList.remove('active');
+          btn.classList.add('active');
+          currentCuisine = btn.textContent;
+          currentPage = 1;
+          render();
+        });
+      });
+    }
+
+    // ================================================================
+    //  Filter & Paginate Logic
+    // ================================================================
+    function getFiltered() {
+      let list = allDishes;
+      const q = searchInput.value.trim().toLowerCase();
+      if (q) {
+        list = list.filter(d =>
+          d.name.includes(q) ||
+          (d.pinyin && d.pinyin.toLowerCase().includes(q)) ||
+          (d.cuisine && d.cuisine.includes(q)) ||
+          (d.dynasty && d.dynasty.includes(q))
+        );
+      }
+      if (currentCuisine !== '全部') {
+        list = list.filter(d => d.cuisine === currentCuisine);
+      }
+      return list;
+    }
+
+    function render() {
+      const filtered = getFiltered();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+      renderDishGrid(pageItems);
+      renderPagination(totalPages, filtered.length);
+    }
+
+    // ================================================================
+    //  Dish Grid
+    // ================================================================
+    function renderDishGrid(items) {
+      if (items.length === 0) {
+        dishGrid.innerHTML = '<div class="loading-spinner" style="grid-column:1/-1;">未找到匹配的菜肴。</div>';
+        return;
+      }
+
+      dishGrid.innerHTML = items.map((dish, idx) => {
+        const hasImg = dish.image && dish.image.trim() !== '';
+        const imgHtml = hasImg
+          ? `<img class="dish-card-image" src="${escapeHtml(dish.image)}" alt="${escapeHtml(dish.name)}" loading="lazy" onerror="webpFallback(this)">`
+          : `<div class="dish-card-image-placeholder">🍲</div>`;
+
+        return `
+          <div class="dish-card" data-index="${idx}" data-name="${escapeHtml(dish.name)}">
+            ${imgHtml}
+            <div class="dish-card-body">
+              <div class="dish-card-name">${escapeHtml(dish.name)}</div>
+              <div class="dish-card-pinyin">${escapeHtml(dish.pinyin || '')}</div>
+              <div class="dish-card-tags">
+                <span class="dish-card-tag cuisine">${escapeHtml(dish.cuisine || '')}</span>
+                <span class="dish-card-tag dynasty">${escapeHtml(dish.dynasty || '')}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach event listeners
+      dishGrid.querySelectorAll('.dish-card').forEach(card => {
+        const name = card.dataset.name;
+        const dish = allDishes.find(d => d.name === name);
+
+        // Click → open modal
+        card.addEventListener('click', () => {
+          if (dish) openModal(dish);
+        });
+
+        // Mouse move → ink wash effect
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+          const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+          card.style.setProperty('--x', x + '%');
+          card.style.setProperty('--y', y + '%');
+        });
+      });
+    }
+
+    // ================================================================
+    //  Pagination
+    // ================================================================
+    function renderPagination(totalPages, totalItems) {
+      if (totalItems === 0) {
+        pagination.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+
+      // Prev button
+      html += `<button class="page-btn" data-page="prev"${currentPage <= 1 ? ' disabled' : ''}>〈</button>`;
+
+      // Page numbers — show at most 5 with ellipsis
+      const maxVisible = 5;
+      let startPage, endPage;
+      if (totalPages <= maxVisible) {
+        startPage = 1;
+        endPage = totalPages;
+      } else {
+        const half = Math.floor(maxVisible / 2);
+        startPage = currentPage - half;
+        endPage = currentPage + half;
+        if (startPage < 1) { startPage = 1; endPage = maxVisible; }
+        if (endPage > totalPages) { endPage = totalPages; startPage = totalPages - maxVisible + 1; }
+      }
+
+      if (startPage > 1) {
+        html += `<button class="page-btn" data-page="1">${CN_NUM[1]}</button>`;
+        if (startPage > 2) html += '<span class="page-info">…</span>';
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn${i === currentPage ? ' active' : ''}" data-page="${i}">${CN_NUM[i]}</button>`;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += '<span class="page-info">…</span>';
+        html += `<button class="page-btn" data-page="${totalPages}">${CN_NUM[totalPages]}</button>`;
+      }
+
+      // Next button
+      html += `<button class="page-btn" data-page="next"${currentPage >= totalPages ? ' disabled' : ''}>〉</button>`;
+
+      // Total info
+      html += `<span class="page-info">共 ${totalItems} 道</span>`;
+
+      pagination.innerHTML = html;
+
+      // Click handlers
+      pagination.querySelectorAll('.page-btn:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.page;
+          if (target === 'prev') goPage(currentPage - 1);
+          else if (target === 'next') goPage(currentPage + 1);
+          else goPage(parseInt(target, 10));
+        });
+      });
+    }
+
+    function goPage(n) {
+      const filtered = getFiltered();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if (n < 1 || n > totalPages) return;
+      currentPage = n;
+      render();
+      dishGrid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ================================================================
+    //  Modal
+    // ================================================================
+    function openModal(dish) {
+      const imgHtml = dish.image && dish.image.trim() !== ''
+        ? `<img class="modal-image" src="${escapeHtml(dish.image)}" alt="${escapeHtml(dish.name)}" onerror="webpFallback(this)">`
+        : `<div class="modal-image-placeholder">🍲</div>`;
+
+      const ingTags = (dish.ingredients || []).map(ing =>
+        `<span class="modal-tag">${escapeHtml(ing)}</span>`
+      ).join('');
+
+      modalContent.innerHTML = `
+        ${imgHtml}
+        <div class="modal-info">
+          <div class="modal-name">${escapeHtml(dish.name)}</div>
+          <div class="modal-pinyin">${escapeHtml(dish.pinyin || '')}</div>
+          <div class="modal-tags-row">
+            <span class="modal-tag cuisine">${escapeHtml(dish.cuisine || '')}</span>
+            <span class="modal-tag">${escapeHtml(dish.origin || '')}</span>
+            <span class="modal-tag dynasty">${escapeHtml(dish.dynasty || '')}</span>
+          </div>
+          ${dish.color ? `<div class="modal-detail-row"><span class="modal-detail-label">色：</span>${escapeHtml(dish.color)}</div>` : ''}
+          ${dish.aroma ? `<div class="modal-detail-row"><span class="modal-detail-label">香：</span>${escapeHtml(dish.aroma)}</div>` : ''}
+          ${dish.taste ? `<div class="modal-detail-row"><span class="modal-detail-label">味：</span>${escapeHtml(dish.taste)}</div>` : ''}
+          ${dish.description ? `<div class="modal-description">${escapeHtml(dish.description)}</div>` : ''}
+          ${dish.story ? `<div class="modal-detail-row"><span class="modal-detail-label">典故：</span>${escapeHtml(dish.story)}</div>` : ''}
+          ${ingTags ? `<div class="modal-tags-row" style="margin-top:0.5rem;">${ingTags}</div>` : ''}
+        </div>
+      `;
+
+      modalOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ================================================================
+    //  Event Handlers
+    // ================================================================
+
+    // Modal: close button
+    modalClose.addEventListener('click', closeModal);
+
+    // Modal: click background (overlay) to close
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    // Modal: Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalOverlay.classList.contains('open')) {
+        closeModal();
+      }
+    });
+
+    // Modal: touch swipe down to close on mobile
+    (function() {
+      let startY = 0, currentY = 0, dragging = false;
+      const scroll = document.getElementById('modalScroll');
+      modalOverlay.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.modal-scroll')) {
+          const rect = scroll.getBoundingClientRect();
+          if (e.touches[0].clientY - rect.top < 40) {
+            startY = e.touches[0].clientY;
+            dragging = true;
+            scroll.style.transition = 'none';
+          }
+        }
+      }, { passive: true });
+      modalOverlay.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        currentY = e.touches[0].clientY;
+        const delta = currentY - startY;
+        if (delta > 0) {
+          scroll.style.transform = `translateY(${delta}px)`;
+          modalOverlay.style.background = `rgba(30, 18, 10, ${Math.max(0, 0.65 - delta/800)})`;
+        }
+      }, { passive: true });
+      modalOverlay.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+        scroll.style.transition = '';
+        scroll.style.transform = '';
+        modalOverlay.style.background = '';
+        if (currentY - startY > 80) closeModal();
+      }, { passive: true });
+    })();
+
+    // Capacitor / Android back button
+    document.addEventListener('backbutton', (e) => {
+      if (modalOverlay.classList.contains('open')) {
+        e.preventDefault();
+        closeModal();
+      }
+    }, false);
+    window.addEventListener('load', () => {
+      if (window.Capacitor?.Plugins?.App) {
+        window.Capacitor.Plugins.App.addListener('backButton', () => {
+          if (modalOverlay.classList.contains('open')) closeModal();
+        });
+      }
+    });
+
+    // Search: debounced input handler
+    let searchTimer = null;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        currentPage = 1;
+        render();
+      }, 300);
+    });
+
+    // ================================================================
+    //  WebP fallback → JPG
+    // ================================================================
+    function webpFallback(img) {
+      const src = img.getAttribute('src') || '';
+      const jpgSrc = src.replace(/\.webp$/i, '.jpg');
+      if (src.endsWith('.webp') && jpgSrc !== src) {
+        img.setAttribute('src', jpgSrc);
+        img.setAttribute('onerror', "this.style.display='none';const p=this.parentElement;const ph=p.querySelector('.dish-card-image-placeholder, .modal-image-placeholder');if(ph)ph.style.display='flex'");
+      } else {
+        img.style.display = 'none';
+        const p = img.parentElement;
+        const ph = p.querySelector('.dish-card-image-placeholder, .modal-image-placeholder');
+        if (ph) ph.style.display = 'flex';
+      }
+    }
+
+    // ================================================================
+    //  Utilities
+    // ================================================================
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ================================================================
+    //  Back to Top
+    // ================================================================
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      backToTop.style.display = window.scrollY > 600 ? 'block' : 'none';
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ================================================================
+    //  Boot
+    // ================================================================
+    loadData();
+  </script>
+
+</body>
+</html>
